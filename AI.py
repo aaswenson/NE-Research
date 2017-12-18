@@ -60,6 +60,13 @@ num_nodes_hl3 = 30
 x = tf.placeholder(tf.float32, [None, len(inputs)])
 y = tf.placeholder(tf.float32, [None, len(output)])
 
+def sigma(x):
+    """
+    The sigmoid function used to wrap the output into the range of 0 to 1
+    :param x: input
+    :return: output in range of 0 to 1
+    """
+    return tf.div(tf.constant(1.0), tf.add(tf.constant(1.0), tf.exp(tf.negative(x))))
 
 def layering(x, input_size, output_size):
     """
