@@ -11,46 +11,23 @@ Used to train and test the AI.
 """
 
 import tensorflow as tf
-from numpy import array
+import numpy as np
+import neutronic_sweeps as ns
 import sys
-import ExtractData
 
-# Extract the data and fill in the inputs and outputs for the AI's training
-ExtractData.run()
-times = array(ExtractData.times)
-quants = array(ExtractData.quants)
-quant_total = array(ExtractData.quant_total)
-spec_pow_list = ExtractData.spec_pow
-spec_pow = array(ExtractData.spec_pow)
-f_initials = (ExtractData.f_initials)
-
-def get_args():
+def load_from_csv(datafile="depl_results.csv"):
+    """load the results data from a csv.
     """
-    Gets the command line arguments cleanly and error checks
-    :return: the command line arguments cleaned
-    """
-    if len(sys.argv) != 5:
-        print("Usage: AI <input_time> <input_spec_pow_of_list> <num_hidden_layers> <num_nodes_per_layer>")
-        return
-    inps = []
-    inps.append(sys.argv[1])
-    inps.append(sys.argv[2])
-    inps.append(sys.argv[3])
-    inps.append(sys.argv[4])
-    return inps
+    data = np.genfromtxt(datafile, delimiter=',',
+            names=ns.dimensions + ['keff', 'ave_E', 'mass'])
+    
+    return data
 
-inps = get_args()
+inputs = load_from_csv()[['core_r', 'PD', 'enrich']]
+output = load_from_csv()['keff']
 
-# The inputs into the model
-input_time = inps[0]
-input_spec_pow = spec_pow[inps[1]]
-inputs = f_initials.append(input_time)
-inputs = f_initials.append(input_spec_pow)
-inputs = array(inputs)
-output = array(quants[inps[1]][input_time])
-
-num_layers = inps[3]
-layer_size = inps[4]
+num_layers = 3
+layer_size = 3
 
 # The number of nodes (DEFAULT) in each of the hidden layers initially
 num_nodes_hl1 = 30
@@ -154,6 +131,6 @@ def train(data):
         print("Accuracy = " + accuracy)
 
     return accuracy
-
-
-train(inputs)
+test = tf.convert_to_tensor(np.array(inputs))
+print(test)
+train(np.array(inputs))
